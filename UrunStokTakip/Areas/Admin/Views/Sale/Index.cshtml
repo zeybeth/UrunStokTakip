@@ -1,0 +1,32 @@
+﻿@model IEnumerable<Entity.Sale>
+
+<div class="card card-dark">
+    <div class="card-header">
+        <h3 class="card-title">Gerçekleşen Satışlar</h3>
+    </div>
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Tarih</th>
+                    <th>Ürün</th>
+                    <th>Adet</th>
+                    <th>Birim Fiyat</th>
+                    <th>Toplam</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.CreatedDate.ToShortDateString()</td>
+                        <td>@(item.Product != null ? item.Product.Name : "Silinmiş Ürün")</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Price.ToString("C2")</td>
+                        <td>@((item.Price * item.Quantity).ToString("C2"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

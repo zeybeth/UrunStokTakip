@@ -1,0 +1,46 @@
+﻿<div class="row">
+    <div class="col-lg-4 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>@ViewBag.ProductCount</h3>
+                <p>Toplam Ürün Sayısı</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-box"></i>
+            </div>
+            <a asp-controller="Product" asp-action="Index" class="small-box-footer">
+                Detaylara Git <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-6">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>@ViewBag.CategoryCount</h3>
+                <p>Toplam Kategori</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-list"></i>
+            </div>
+            <a asp-controller="Category" asp-action="Index" class="small-box-footer">
+                Detaylara Git <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-12">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>@ViewBag.SaleCount</h3>
+                <p>Yapılan Satışlar</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <a asp-controller="Sale" asp-action="Index" class="small-box-footer">
+                Detaylara Git <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+</div>

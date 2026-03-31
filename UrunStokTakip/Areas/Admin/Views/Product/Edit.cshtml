@@ -1,0 +1,125 @@
+﻿@model Entity.Product
+
+@{
+    ViewData["Title"] = "Ürün Düzenle";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Ürün Düzenleme</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">@Model.Name - Bilgilerini Güncelle</h3>
+            </div>
+
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                @* ID ve CreatedDate gizli gönderimi *@
+                <input type="hidden" asp-for="ID" />
+                <input type="hidden" asp-for="CreatedDate" />
+                <input type="hidden" asp-for="Picture" />
+
+                <div class="card-body">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Name">Ürün Adı</label>
+                                <input asp-for="Name" class="form-control" placeholder="Ürün adını giriniz">
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Kategori</label>
+                                <select asp-for="CategoryId" class="form-control"
+                                        asp-items="@(new SelectList(ViewBag.Kategoriler, "ID", "Name"))">
+                                    <option value="">-- Kategori Seçiniz --</option>
+                                </select>
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Price">Fiyat (₺)</label>
+                                <input asp-for="Price" type="number" step="0.01" class="form-control">
+                                <span asp-validation-for="Price" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Stock">Stok Adedi</label>
+                                <input asp-for="Stock" type="number" class="form-control">
+                                <span asp-validation-for="Stock" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group mt-4 pt-2">
+                                <div class="custom-control custom-switch">
+                                    <input asp-for="IsActive" type="checkbox" class="custom-control-input" id="isActiveSwitch">
+                                    <label class="custom-control-label" for="isActiveSwitch">Ürün Satışta mı?</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Description">Ürün Açıklaması</label>
+                                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <div class="form-group text-left">
+                                
+                                <img src="~/img/@Model.Picture" style="width:120px; margin-bottom:10px;" class="img-thumbnail shadow-sm" />
+
+                                <label>Resmi Değiştir</label>
+                                <div class="custom-file">
+                                    <input type="file" name="imageFile" class="custom-file-input" id="customFile" accept=".jpg,.jpeg,.png,.webp">
+                                    
+                                </div>
+                                <small class="text-muted">Resmi değiştirmek istemiyorsanız boş bırakın.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                    <a asp-action="Index" class="btn btn-default float-right">İptal</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    @* SEÇİLEN DOSYA ADININ GÖRÜNMESİ İÇİN GEREKLİ SCRIPT *@
+    <script>
+        $(document).ready(function () {
+            $('.custom-file-input').on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            });
+        });
+    </script>
+}

@@ -1,0 +1,65 @@
+﻿@model UrunStokTakip.Models.LoginModel
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>UrunStokTakip | Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/admin-theme/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+</head>
+<body class="login-page bg-body-secondary">
+    <div class="login-box">
+        <div class="login-logo">
+            <a href="/"><b>Stock</b>Tracking</a>
+        </div>
+        <div class="card">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg">Sign in to start your session</p>
+
+                @* ASP.NET Core Tag Helpers kullanarak formu bağladık *@
+                <form asp-controller="Account" asp-action="Login" method="post">
+
+                    @* Hata mesajlarını göstermek için *@
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                    <div class="input-group mb-3">
+                        @* asp-for kullanarak LoginModel.Email ile eşleştirdik *@
+                        <input asp-for="Email" class="form-control" placeholder="Email" />
+                        <div class="input-group-text"><span class="bi bi-envelope"></span></div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        @* asp-for="Password" (Artık Sifre değil) *@
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+                        <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="form-check">
+                                @* RememberMe bağlantısı *@
+                                <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
+                                <label asp-for="RememberMe" class="form-check-label">Remember Me</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Sign In</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <p class="mb-1 mt-3">
+                    <a href="#">Forgot Password</a>
+                </p>
+                <p class="mb-0">
+                    <a asp-controller="Account" asp-action="Register" class="text-center">Register</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

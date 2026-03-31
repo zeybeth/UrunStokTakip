@@ -1,0 +1,49 @@
+﻿@model UrunStokTakip.Models.RegisterModel
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>StockTracking | Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/admin-theme/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+</head>
+<body class="register-page bg-body-secondary">
+    <div class="register-box">
+        <div class="register-logo">
+            <a href="/"><b>Stock</b>Tracking</a>
+        </div>
+        <div class="card">
+            <div class="card-body register-card-body">
+                <p class="register-box-msg">Register a new membership</p>
+
+                <form asp-controller="Account" asp-action="Register" method="post">
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                    <div class="input-group mb-3">
+                        <input asp-for="Email" class="form-control" placeholder="Email" />
+                        <div class="input-group-text"><span class="bi bi-envelope"></span></div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+                        <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Retype Password" />
+                        <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </div>
+                </form>
+
+                <a asp-controller="Account" asp-action="Login" class="text-center mt-3 d-block">I already have a membership</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

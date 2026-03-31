@@ -1,0 +1,34 @@
+﻿@model IEnumerable<Entity.Category>
+
+<div class="card card-dark">
+    <div class="card-header">
+        <h3 class="card-title">Kategori Yönetimi</h3>
+        <div class="card-tools">
+            <a asp-action="Create" class="btn btn-primary btn-sm">Yeni Kategori Ekle</a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Kategori Adı</th>
+                    <th>Açıklama</th>
+                    <th style="width: 200px">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-info btn-sm">Düzenle</a>
+                            <a asp-action="Delete" asp-route-id="@item.ID" class="btn btn-danger btn-sm" onclick="return confirm('Silmek istediğinize emin misiniz?')">Sil</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

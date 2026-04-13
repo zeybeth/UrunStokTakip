@@ -4,7 +4,7 @@
     <div class="card-header">
         <h3 class="card-title">Kategoriyi Düzenle: @Model.Name</h3>
     </div>
-    <form asp-action="Edit" method="post">
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
         <input type="hidden" asp-for="ID" />
 
         <div class="card-body">

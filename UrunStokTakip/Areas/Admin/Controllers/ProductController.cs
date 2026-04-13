@@ -41,35 +41,26 @@ public class ProductController : Controller
 
     private async Task<string?> SaveImageFile(IFormFile file)
     {
-        try
+        if (file == null || file.Length == 0) return null;
+
+        // wwwroot/img yolunu oluştur
+        string uploadsFolder = Path.Combine(_env.WebRootPath, "img");
+
+        // Klasör yoksa oluştur
+        if (!Directory.Exists(uploadsFolder))
         {
-            if (file == null || file.Length == 0)
-                return null;
-
-            if (string.IsNullOrEmpty(_env.WebRootPath))
-                return null;
-
-            var uploadsFolder = Path.Combine(_env.WebRootPath, "img");
-
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(fileStream);
-            }
-
-            return uniqueFileName;
+            Directory.CreateDirectory(uploadsFolder);
         }
-        catch (Exception)
+
+        string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        using (var fileStream = new FileStream(filePath, FileMode.Create))
         {
-            return null;
+            await file.CopyToAsync(fileStream);
         }
+
+        return uniqueFileName;
     }
 
     public async Task<IActionResult> Index()
@@ -95,26 +86,24 @@ public class ProductController : Controller
     {
         try
         {
-            var test = ValidateImageFile(imageFile);
-            if (test != null)
+            // 1. Resim Doğrulama
+            var imageError = ValidateImageFile(imageFile);
+            if (imageError != null)
             {
-                ModelState.AddModelError("", test);
+                ModelState.AddModelError("", imageError);
                 ViewBag.Kategoriler = await _uow.Categories.GetAll().ToListAsync();
                 return View(product);
             }
 
-            product.ID = Guid.NewGuid();
+            // 2. Resim Kaydetme
+            if (imageFile != null)
+            {
+                product.Picture = await SaveImageFile(imageFile);
+            }
+
+            // 3. Veri Hazırlama (ID atamasını sildik, DB halledecek)
             product.CreatedDate = DateTime.Now;
             product.IsActive = true;
-
-            if (imageFile != null && imageFile.Length > 0)
-            {
-                var fileName = await SaveImageFile(imageFile);
-                if (!string.IsNullOrEmpty(fileName))
-                {
-                    product.Picture = fileName;
-                }
-            }
 
             await _uow.Products.AddAsync(product);
             await _uow.SaveAsync();
@@ -123,7 +112,7 @@ public class ProductController : Controller
         }
         catch (Exception ex)
         {
-            ModelState.AddModelError("", $"HATA: {ex.Message}");
+            ModelState.AddModelError("", $"Hata: {ex.Message}");
             ViewBag.Kategoriler = await _uow.Categories.GetAll().ToListAsync();
             return View(product);
         }
@@ -144,36 +133,40 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, Product product, IFormFile? imageFile)
     {
+        // 1. Güvenlik Kontrolü: URL'deki ID ile formdan gelen ID aynı mı?
+        if (id != product.ID) return NotFound();
+
         try
         {
-            var validationError = ValidateImageFile(imageFile);
-            if (validationError != null)
-            {
-                ModelState.AddModelError("", validationError);
-                ViewBag.Kategoriler = await _uow.Categories.GetAll().ToListAsync();
-                return View(product);
-            }
+            // 2. Takip Çakışmasını Önlemek İçin Veriyi Önce Çekiyoruz
+            var existingProduct = await _uow.Products.GetByIdAsync(id);
+            if (existingProduct == null) return NotFound();
 
+            // 3. Resim İşlemi (Eğer yeni resim varsa güncelle, yoksa eskisini koru)
             if (imageFile != null && imageFile.Length > 0)
             {
-                var fileName = await SaveImageFile(imageFile);
-                if (!string.IsNullOrEmpty(fileName))
-                {
-                    product.Picture = fileName;
-                }
+                existingProduct.Picture = await SaveImageFile(imageFile);
             }
 
-            product.UpdateDate = DateTime.Now;
+            // 4. Sadece Değişen Alanları Mevcut Nesneye Aktar
+            existingProduct.Name = product.Name;
+            existingProduct.CategoryId = product.CategoryId;
+            existingProduct.Price = product.Price;
+            existingProduct.Stock = product.Stock;
+            existingProduct.IsActive = product.IsActive; // Checkbox'tan gelir
+            existingProduct.UpdateDate = DateTime.Now;
 
-            _uow.Products.Update(product);
+            // 5. Güncelleme ve Kaydet
+            _uow.Products.Update(existingProduct);
             await _uow.SaveAsync();
 
             return RedirectToAction(nameof(Index));
         }
         catch (Exception ex)
         {
-            ModelState.AddModelError("", $"Hata oluştu: {ex.Message}");
+            // Hata durumunda kategorileri tekrar yükleyip sayfaya dön
             ViewBag.Kategoriler = await _uow.Categories.GetAll().ToListAsync();
+            ModelState.AddModelError("", "Güncelleme sırasında bir hata oluştu: " + ex.Message);
             return View(product);
         }
     }

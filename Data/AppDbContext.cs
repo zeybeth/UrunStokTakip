@@ -21,7 +21,7 @@ public class AppDbContext : IdentityDbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
+        builder.Entity<Product>().Property(x => x.ID).HasDefaultValueSql("newid()");
         // Tüm decimal alanlar için standart hassasiyet belirle
         foreach (var property in builder.Model.GetEntityTypes()
             .SelectMany(t => t.GetProperties())

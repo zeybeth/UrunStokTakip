@@ -1,13 +1,15 @@
 ﻿using Data;
 using Data.Abstract;
 using Entity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
-
+using Microsoft.AspNetCore.Hosting;
 namespace UrunStokTakip.Areas.Admin.Controllers;
 
 [Area("Admin")]
+[Authorize(Roles = "Admin")]
 public class ProductController : Controller
 {
     private readonly IUnitOfWork _uow;
@@ -86,7 +88,7 @@ public class ProductController : Controller
     {
         try
         {
-            // 1. Resim Doğrulama
+            //  Resim Doğrulama
             var imageError = ValidateImageFile(imageFile);
             if (imageError != null)
             {
@@ -95,13 +97,13 @@ public class ProductController : Controller
                 return View(product);
             }
 
-            // 2. Resim Kaydetme
+            //  Resim Kaydetme
             if (imageFile != null)
             {
                 product.Picture = await SaveImageFile(imageFile);
             }
 
-            // 3. Veri Hazırlama (ID atamasını sildik, DB halledecek)
+            //  Veri Hazırlama 
             product.CreatedDate = DateTime.Now;
             product.IsActive = true;
 
@@ -131,32 +133,32 @@ public class ProductController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, Product product, IFormFile? imageFile)
+    public async Task<IActionResult> Edit(Guid id, [FromForm] Product product, IFormFile? imageFile)
     {
-        // 1. Güvenlik Kontrolü: URL'deki ID ile formdan gelen ID aynı mı?
+        // Kontrol: URL'deki ID ile formdan gelen ID aynı mı?
         if (id != product.ID) return NotFound();
 
         try
         {
-            // 2. Takip Çakışmasını Önlemek İçin Veriyi Önce Çekiyoruz
+            // Veriyi Önce Çekiyoruz
             var existingProduct = await _uow.Products.GetByIdAsync(id);
             if (existingProduct == null) return NotFound();
 
-            // 3. Resim İşlemi (Eğer yeni resim varsa güncelle, yoksa eskisini koru)
+            // Eğer yeni resim varsa güncelle, yoksa eskisini koru
             if (imageFile != null && imageFile.Length > 0)
             {
                 existingProduct.Picture = await SaveImageFile(imageFile);
             }
 
-            // 4. Sadece Değişen Alanları Mevcut Nesneye Aktar
+            //Sadece Değişen Alanları Mevcut Nesneye Aktar
             existingProduct.Name = product.Name;
             existingProduct.CategoryId = product.CategoryId;
             existingProduct.Price = product.Price;
             existingProduct.Stock = product.Stock;
-            existingProduct.IsActive = product.IsActive; // Checkbox'tan gelir
+            existingProduct.IsActive = product.IsActive;
             existingProduct.UpdateDate = DateTime.Now;
 
-            // 5. Güncelleme ve Kaydet
+            // Kaydet
             _uow.Products.Update(existingProduct);
             await _uow.SaveAsync();
 

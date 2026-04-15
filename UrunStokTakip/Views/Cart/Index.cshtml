@@ -1,0 +1,129 @@
+﻿@model IEnumerable<Entity.Cart>
+
+@{
+    ViewData["Title"] = "Sepetim";
+
+    // Sepetin toplam tutarı
+    decimal sepetToplami = Model.Sum(x => x.Product.Price * x.Quantity);
+
+    // Kargo mantığı: 500 TL üzeri bedava, altıysa 49.90 TL
+    decimal kargoUcreti = sepetToplami > 500 || sepetToplami == 0 ? 0 : 49.90m;
+    decimal genelToplam = sepetToplami + kargoUcreti;
+}
+
+<div class="container mt-5 mb-5">
+    <h2 class="fw-bold mb-4">Sepetim (@Model.Count() Ürün)</h2>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mt-3 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Sipariş Tamamlanamadı:</strong> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 shadow-sm rounded bg-white">
+            <i class="bi bi-cart-x text-muted" style="font-size: 5rem;"></i>
+            <h4 class="mt-3 text-secondary">Sepetinizde ürün bulunmamaktadır.</h4>
+            <p class="text-muted">Hemen alışverişe başlayın ve fırsatları kaçırmayın!</p>
+            <a href="/Home/Index" class="btn btn-primary mt-3 px-4 py-2">Alışverişe Başla</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-0">
+                        @foreach (var item in Model)
+                        {
+                            <div class="row align-items-center p-3 border-bottom m-0">
+                                <div class="col-md-2 col-3 text-center">
+                                    @if (!string.IsNullOrEmpty(item.Product.Picture))
+                                    {
+                                        <img src="~/img/@item.Product.Picture" class="img-fluid rounded" style="max-height: 80px; object-fit: contain;" alt="@item.Product.Name">
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-box-seam text-secondary" style="font-size: 3rem;"></i>
+                                    }
+                                </div>
+
+                                <div class="col-md-5 col-9">
+                                    <h6 class="fw-bold mb-1">@item.Product.Name</h6>
+                                    <small class="text-success"><i class="bi bi-truck"></i> Yarın Kargoda</small>
+                                </div>
+
+                                <div class="col-md-3 col-6 mt-3 mt-md-0 d-flex justify-content-center">
+                                    <div class="d-flex align-items-center">
+                                        <form asp-controller="Cart" asp-action="Decrease" method="post" class="m-0">
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm fw-bold px-3">-</button>
+                                        </form>
+
+                                        <input type="text" class="form-control form-control-sm text-center mx-1 fw-bold" style="width: 50px;" value="@item.Quantity" readonly>
+
+                                        <form asp-controller="Cart" asp-action="Increase" method="post" class="m-0">
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm fw-bold px-3">+</button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2 col-6 mt-3 mt-md-0 text-end">
+                                    <h6 class="fw-bold text-primary mb-2">@((item.Product.Price * item.Quantity).ToString("C2"))</h6>
+
+                                    <form asp-controller="Cart" asp-action="Remove" method="post">
+                                        <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <button type="submit" class="btn btn-link text-danger text-decoration-none small p-0 m-0">
+                                            <i class="bi bi-trash"></i> Sil
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">Sipariş Özeti</h5>
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Ürünün Toplamı</span>
+                            <span class="fw-bold">@sepetToplami.ToString("C2")</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3 border-bottom pb-3">
+                            <span class="text-muted">Kargo Toplamı</span>
+                            @if (kargoUcreti == 0)
+                            {
+                                <span class="text-success fw-bold">Bedava</span>
+                            }
+                            else
+                            {
+                                <span class="fw-bold">@kargoUcreti.ToString("C2")</span>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="h5 fw-bold">Genel Toplam</span>
+                            <span class="h5 fw-bold text-primary">@genelToplam.ToString("C2")</span>
+                        </div>
+
+                        <form asp-controller="Cart" asp-action="Checkout" method="post">
+                            <button type="submit" class="btn btn-success w-100 py-3 fw-bold fs-5 shadow-sm">
+                                Siparişi Tamamla <i class="bi bi-check-circle ms-2"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

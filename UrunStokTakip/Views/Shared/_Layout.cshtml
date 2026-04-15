@@ -3,104 +3,121 @@
 @inject UserManager<IdentityUser> UserManager
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - StockTracking</title>
-    <link rel="stylesheet" href="~/admin-theme/dist/css/adminlte.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+    <title>@ViewData["Title"] - Ürün Stok Takip</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        .navbar { box-shadow: 0 2px 4px rgba(0,0,0,.08); background: #ffffff !important; }
+        .nav-link { font-weight: 500; color: #444; }
+        .nav-link:hover { color: #0d6efd; }
+        .admin-badge { background: #fff1f1; color: #dc3545; border: 1px solid #ffc9c9; }
+        .main-container { min-height: 80vh; padding-top: 30px; padding-bottom: 50px; }
+        .footer { background: #ffffff; border-top: 1px solid #eee; padding: 20px 0; color: #666; }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
 </head>
-<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
-    <div class="app-wrapper">
-        <nav class="app-header navbar navbar-expand bg-body">
-            <div class="container-fluid">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
-                            <i class="bi bi-list"></i>
-                        </a>
-                    </li>
-                </ul>
+<body>
 
-                <ul class="navbar-nav ms-auto">
-                    @if (SignInManager.IsSignedIn(User))
-                    {
-                        <li class="nav-item dropdown user-menu">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                <span class="d-none d-md-inline">@User.Identity?.Name</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                                <li class="user-footer">
-                                    <form asp-controller="Account" asp-action="Logout" method="post">
-                                        <button type="submit" class="btn btn-default btn-flat float-end">Sign Out</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
-                        </li>
-                    }
-                </ul>
-            </div>
-        </nav>
-
-        <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-            <div class="sidebar-brand">
-                <a asp-controller="Home" asp-action="Index" class="brand-link">
-                    <span class="brand-text fw-light">Stock Tracking</span>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+            <div class="container">
+                <a class="navbar-brand fw-bold text-primary" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-box-seam"></i> STOK TAKİP
                 </a>
-            </div>
-            <div class="sidebar-wrapper">
-                <nav class="mt-2">
-                    <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu">
-                        <li class="nav-item">
-                            <a asp-controller="Home" asp-action="Index" class="nav-link">
-                                <i class="nav-icon bi bi-speedometer"></i>
-                                <p>Dashboard</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-controller="Product" asp-action="Index" class="nav-link">
-                                <i class="nav-icon bi bi-box-seam"></i>
-                                <p>Products</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-controller="Category" asp-action="Index" class="nav-link">
-                                <i class="nav-icon bi bi-list-ul"></i>
-                                <p>Categories</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-controller="Sale" asp-action="Index" class="nav-link">
-                                <i class="nav-icon bi bi-cart-check"></i>
-                                <p>Sales</p>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </aside>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
 
-        <main class="app-main">
-            <div class="app-content-header">
-                <div class="container-fluid">
-                    @RenderBody()
+                        @await Component.InvokeAsync("CartCount")
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item mx-2">
+                                <a class="nav-link text-dark position-relative d-flex align-items-center" asp-area="" asp-controller="Order" asp-action="Index">
+                                    <i class="bi bi-box2-heart" style="font-size: 1.4rem;"></i>
+                                    <span class="ms-1 d-none d-md-inline fw-bold" style="font-size: 0.9rem;">Siparişlerim</span>
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+
+
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item me-3">
+                                    <a class="nav-link admin-badge rounded-pill px-3 py-1 btn-sm" href="/Admin/Product">
+                                        <i class="bi bi-shield-lock"></i> Yönetim Paneli
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="nav-link">
+                                        <i class="nav-icon bi bi-bag-check-fill"></i>
+                                        <p>Sipariş Yönetimi</p>
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle"></i> @User.Identity?.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                    <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Ayarlar</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bi bi-box-arrow-right me-2"></i> Çıkış Yap
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">Giriş Yap</a>
+                            </li>
+                            <li class="nav-item ms-lg-2">
+                                <a class="btn btn-primary btn-sm rounded-pill px-4" asp-controller="Account" asp-action="Register">Kayıt Ol</a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
+        </nav>
+    </header>
+
+    <div class="container main-container">
+        <main role="main" class="pb-3">
+            @RenderBody()
         </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/admin-theme/dist/js/adminlte.min.js"></script>
+    <footer class="footer">
+        <div class="container text-center">
+            &copy; @DateTime.Now.Year - Ürün Stok Takip Sistemi - <a asp-area="" asp-controller="Home" asp-action="Privacy">Gizlilik</a>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

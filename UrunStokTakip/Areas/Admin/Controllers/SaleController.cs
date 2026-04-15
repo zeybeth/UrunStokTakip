@@ -1,10 +1,12 @@
 ﻿using Data.Abstract;
 using Entity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 namespace UrunStokTakip.Areas.Admin.Controllers;
 [Area("Admin")]
+[Authorize(Roles = "Admin")]
 public class SaleController : Controller
 {
     private readonly IUnitOfWork _uow;

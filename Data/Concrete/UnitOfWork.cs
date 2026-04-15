@@ -16,7 +16,7 @@ public class UnitOfWork : IUnitOfWork
         _repositories = new ConcurrentDictionary<Type, object>();
     }
 
-    //  her seferinde 'new'lemek yerine merkezi metot
+ 
     public IRepository<Product> Products => GetRepository<Product>();
     public IRepository<Category> Categories => GetRepository<Category>();
     public IRepository<Cart> Carts => GetRepository<Cart>();

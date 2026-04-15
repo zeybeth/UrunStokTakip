@@ -1,0 +1,61 @@
+﻿@model IEnumerable<Entity.Sale>
+
+@{
+    ViewData["Title"] = "Siparişlerim";
+}
+
+<div class="container mt-5 mb-5" style="min-height: 60vh;">
+    <h2 class="fw-bold mb-4">Sipariş Geçmişim</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 bg-light rounded shadow-sm">
+            <i class="bi bi-box-seam text-secondary mb-3" style="font-size: 4rem;"></i>
+            <h4>Henüz hiç sipariş vermemişsiniz.</h4>
+            <p class="text-muted">İlk alışverişinizi yapmak için fırsatları kaçırmayın!</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-2 px-4">Alışverişe Başla</a>
+        </div>
+    }
+    else
+    {
+        @foreach (var orderGroup in Model.GroupBy(x => x.CreatedDate.ToString("dd MMMM yyyy - HH:mm")))
+        {
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+                    <div>
+                        <span class="text-muted small d-block">Sipariş Tarihi</span>
+                        <span class="fw-bold">@orderGroup.Key</span>
+                    </div>
+
+                    <div class="text-end">
+                        <span class="text-muted small d-block">Sipariş Özeti</span>
+                        <span class="text-success fw-bold d-block">
+                            @orderGroup.Sum(x => x.Price * x.Quantity).ToString("C2")
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in orderGroup)
+                        {
+                            <li class="list-group-item p-3 d-flex align-items-center">
+                                <img src="~/img/@item.Product.Picture" style="width: 70px; height: 70px; object-fit: contain;" class="border rounded me-3" />
+
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-1">@item.Product.Name</h6>
+                                    <small class="text-muted">Adet: @item.Quantity</small>
+                                </div>
+
+                                <div class="text-end">
+                                    <h6 class="fw-bold text-primary mb-1">@((item.Price * item.Quantity).ToString("C2"))</h6>
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-box me-1"></i> Hazırlanıyor</span>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    }
+</div>
